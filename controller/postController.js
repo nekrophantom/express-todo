@@ -1,11 +1,17 @@
 import { PrismaClient } from '@prisma/client'
+import successResponse from '../utils/successResponse.js';
 
 const prisma = new PrismaClient()
 
 export const getTodos = async (req, res, next) => {
-  const todos = await prisma.todo.findMany()
-
-  return res.status(200).json(todos)
+  try {
+    const todos = await prisma.todo.findMany()
+  
+    return successResponse(res, todos)
+    
+  } catch (error) {
+    next(error);
+  }
 }
 
 export const getTodo = async (req, res, next) => {
@@ -22,7 +28,7 @@ export const getTodo = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json(todo)
+  successResponse(res, todo, "", 201)
 } 
 
 export const createTodo = async (req, res, next) => {
@@ -40,7 +46,7 @@ export const createTodo = async (req, res, next) => {
     }
   })
 
-  res.status(201).json(todos)
+  successResponse(res, todos, "", 201)
 }
 
 export const editTodo = async(req, res, next) => {
@@ -59,7 +65,7 @@ export const editTodo = async(req, res, next) => {
       return next(error);
     }
 
-    const { title } = req.body
+    const { title, status } = req.body
 
     if (!title) {
       const error = new Error(`Please include title`)
@@ -72,11 +78,12 @@ export const editTodo = async(req, res, next) => {
         id : id
       },
       data : {
-        title : title
+        title : title,
+        status : status
       }
     })
 
-    res.status(201).json(updatedTodo)
+    successResponse(res, updatedTodo, "", 201)
   } catch (error) {
     next(error);
   }
