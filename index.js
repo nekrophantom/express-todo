@@ -2,11 +2,16 @@ import express from 'express';
 import logger from "./middleware/logger.js";
 import posts from './routes/posts.js'
 import errorHandler from './middleware/error.js';
+import dotenv from 'dotenv';
+import cors from 'cors';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
 
 // Body parser middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
@@ -21,7 +26,7 @@ app.get('/', (req, res, next) => {
 app.use('/api/todo', posts)
 
 
-// Error Handler 
+// Error Handler
 app.use(errorHandler)
 
 app.listen(port, () => console.log(`Server is running on port: ${port}`));
